@@ -59,14 +59,12 @@ class GameTest {
         game.playerMove(4, 4);
 
         game.nextTurn();
-        game.printGameState();
         assertEquals(true, game.isValidMove(game.currentPlayer(), 4, 3)); // capture
         game.playerMove(4, 3);
         assertEquals(game.currentPlayer().numStonesCaptured(), 1);
 
         game.nextTurn();
         assertEquals(false, game.isValidMove(game.currentPlayer(), 4, 4)); // ko rule
-        game.nextTurn();
         assertEquals(false, game.isValidMove(game.currentPlayer(), 4, 4));
         game.playerMove(4, 4);
     }

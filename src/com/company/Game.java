@@ -38,7 +38,7 @@ public class Game {
         System.out.println((currentPlayer.getColor() == Color.WHITE ? "WHITE" : "BLACK") + " attempt to place stone at [" + row + "," + col + "]");
 
         if (!isValidMove(currentPlayer, row, col)) {
-            System.out.println("Invalid move attempt!");
+            System.out.println("INVALID MOVE!! TRY AGAIN!");
             return;
         }
 
@@ -46,16 +46,16 @@ public class Game {
         int numStonesCaptured = board.captureStones(currentPlayer.getColor());      // capture enemy stones
         currentPlayer.incrementStonesCaptured(numStonesCaptured);                   // increment score by # stones captured
 
-        printGameState();
+        System.out.println(toString());
     }
 
     public void nextTurn() {
         turn = ++turn % 2;
     }
 
-    public void printGameState() {
-        System.out.print(board.toString());
-        System.out.println("SCORES P1: " + players[0].numStonesCaptured() + " P2: " + players[1].numStonesCaptured() + '\n');
+    @Override
+    public String toString() {
+        return board.toString() + "SCORES P1: " + players[0].numStonesCaptured() + " P2: " + players[1].numStonesCaptured() + '\n';
     }
 
     public Player currentPlayer() {
@@ -67,27 +67,23 @@ public class Game {
     }
 
     private static class MoveData {
-
         private Pair<Integer, Integer> position;
         private int stonesCaptured;
 
-        public MoveData(int x, int y, int stonesCaptured) {
+        MoveData(int x, int y, int stonesCaptured) {
             position = new Pair<>(x, y);
             this.stonesCaptured = stonesCaptured;
         }
 
-        public MoveData(Pair<Integer, Integer> pair, int stonesCaptured) {
+        MoveData(Pair<Integer, Integer> pair, int stonesCaptured) {
             this.position = pair;
             this.stonesCaptured = stonesCaptured;
         }
 
         @Override
         public boolean equals(Object o) {
-            if(!(o instanceof MoveData)) return false;
-            if(o == this) return true;
-            return ((MoveData)o).stonesCaptured == this.stonesCaptured && ((MoveData)o).position.equals(this.position);
+            return o instanceof MoveData && (o == this || ((MoveData) o).stonesCaptured == this.stonesCaptured && ((MoveData) o).position.equals(this.position));
         }
-
     }
 
 }
