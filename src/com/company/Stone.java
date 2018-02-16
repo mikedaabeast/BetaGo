@@ -24,16 +24,12 @@ public class Stone {
         return color;
     }
 
-    public int getMaxLiberties() {
-        return maxLiberties;
-    }
-
     public static int getNumLiberties(Stone s, Set<Stone> visited) { // pass visited set down recursive calls
         if(s == null || visited.contains(s))                         // to make sure we visit each node only once
             return 0;                                                // and don't get stuck in a cycle
 
         visited.add(s);
-        int numLiberties = (s.getMaxLiberties() - s.getAdjacentStones().size());
+        int numLiberties = (s.maxLiberties - s.getAdjacentStones().size());
 
         for(Stone adjacentStone : s.getAdjacentStones())
             if(adjacentStone.getColor() == s.getColor())

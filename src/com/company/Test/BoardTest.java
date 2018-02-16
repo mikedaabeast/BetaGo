@@ -20,11 +20,11 @@ class BoardTest {
         board.placeStoneOnBoard(1, 1, Color.WHITE);
         board.placeStoneOnBoard(0, 2, Color.WHITE);
 
-        assertEquals(1, Stone.getNumLiberties(board.getBoard()[1][0], new HashSet<>()));   // test if suicide move in corner valid
-        assertEquals(1, Stone.getNumLiberties(board.getBoard()[0][1], new HashSet<>()));   // test if suicide move in corner valid
-        assertEquals(2, Stone.getNumLiberties(board.getBoard()[2][0], new HashSet<>()));   // test if suicide move in corner valid
-        assertEquals(2, Stone.getNumLiberties(board.getBoard()[1][1], new HashSet<>()));   // test if suicide move in corner valid
-        assertEquals(2, Stone.getNumLiberties(board.getBoard()[0][2], new HashSet<>()));   // test if suicide move in corner valid
+        assertEquals(1, Stone.getNumLiberties(board.getBoard()[1][0], new HashSet<>()));
+        assertEquals(1, Stone.getNumLiberties(board.getBoard()[0][1], new HashSet<>()));
+        assertEquals(2, Stone.getNumLiberties(board.getBoard()[2][0], new HashSet<>()));
+        assertEquals(2, Stone.getNumLiberties(board.getBoard()[1][1], new HashSet<>()));
+        assertEquals(2, Stone.getNumLiberties(board.getBoard()[0][2], new HashSet<>()));
     }
 
     @Test
@@ -33,15 +33,15 @@ class BoardTest {
         Board board = new Board(size);
 
         board.placeStoneOnBoard(1, 1, Color.BLACK);
-        assertEquals(4, Stone.getNumLiberties(board.getBoard()[1][1], new HashSet<>()));   // test if suicide move in corner valid
+        assertEquals(4, Stone.getNumLiberties(board.getBoard()[1][1], new HashSet<>()));
         board.placeStoneOnBoard(1, 0, Color.WHITE);
-        assertEquals(3, Stone.getNumLiberties(board.getBoard()[1][1], new HashSet<>()));   // test if suicide move in corner valid
+        assertEquals(3, Stone.getNumLiberties(board.getBoard()[1][1], new HashSet<>()));
         board.removeStoneFromBoard(1, 0);
-        assertEquals(4, Stone.getNumLiberties(board.getBoard()[1][1], new HashSet<>()));   // test if suicide move in corner valid
+        assertEquals(4, Stone.getNumLiberties(board.getBoard()[1][1], new HashSet<>()));
         board.placeStoneOnBoard(1, 0, Color.WHITE);
-        assertEquals(3, Stone.getNumLiberties(board.getBoard()[1][1], new HashSet<>()));   // test if suicide move in corner valid
+        assertEquals(3, Stone.getNumLiberties(board.getBoard()[1][1], new HashSet<>()));
         board.removeStoneFromBoard(1, 0);
-        assertEquals(4, Stone.getNumLiberties(board.getBoard()[1][1], new HashSet<>()));   // test if suicide move in corner valid
+        assertEquals(4, Stone.getNumLiberties(board.getBoard()[1][1], new HashSet<>()));
 
         board.placeStoneOnBoard(0, 0, Color.BLACK);
         board.placeStoneOnBoard(1, 0, Color.BLACK);
@@ -54,12 +54,12 @@ class BoardTest {
         assertEquals(board.getBoard()[0][0], null);         // check that stone was removed from board
         assertEquals(board.getBoard()[1][0], null);         // check that stone was removed from board
         assertEquals(board.getBoard()[0][1], null);         // check that stone was removed from board
-        assertEquals(4, Stone.getNumLiberties(board.getBoard()[1][1], new HashSet<>()));   // test if suicide move in corner valid
+        assertEquals(4, Stone.getNumLiberties(board.getBoard()[1][1], new HashSet<>()));
 
         board.placeStoneOnBoard(0, 1, Color.BLACK);
         board.placeStoneOnBoard(1, 0, Color.BLACK);
 
-        assertEquals(2, Stone.getNumLiberties(board.getBoard()[1][1], new HashSet<>()));   // test if suicide move in corner valid
+        assertEquals(2, Stone.getNumLiberties(board.getBoard()[1][1], new HashSet<>()));
         assertEquals(false, board.isValidMove(0, 0, Color.BLACK));  // test suicide move
     }
 

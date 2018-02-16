@@ -5,12 +5,11 @@ public class Player {
 
     private Color color;
     private String name;
-    private int enemyStonesCaptures;
+    private int enemyStonesCaptured;
 
     public Player(String name, Color color) {
         this.name = name;
         this.color = color;
-        enemyStonesCaptures = 0;
     }
 
     public Color getColor() {
@@ -18,11 +17,11 @@ public class Player {
     }
 
     public void incrementStonesCaptured(int n) {
-        enemyStonesCaptures += n;
+        enemyStonesCaptured += n;
     }
 
-    public int numEnemyStonesCaptured() {
-        return enemyStonesCaptures;
+    public int numStonesCaptured() {
+        return enemyStonesCaptured;
     }
 
     public String getName() {

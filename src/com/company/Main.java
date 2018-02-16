@@ -36,5 +36,7 @@ public class Main {
 
         game.playerMove(4, 4);
         game.playerMove(4, 6);
+
     }
+
 }

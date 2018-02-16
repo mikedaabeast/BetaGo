@@ -13,6 +13,7 @@ class GameTest {
         Game game = new Game();
 
         Player[] players = game.getPlayers();
+
         assertEquals(players[0].getColor(), Color.BLACK);
         assertEquals(players[1].getColor(), Color.WHITE);
 
@@ -29,7 +30,6 @@ class GameTest {
     void testKO() {
         Game game = new Game();
 
-        Player[] players = game.getPlayers();
         game.playerMove(8, 6);
         game.playerMove(7, 7);
         game.playerMove(8, 8);
@@ -37,13 +37,13 @@ class GameTest {
         game.playerMove(7, 8);
         assertEquals(true, game.isValidMove(game.currentPlayer(), 8, 7));
         game.playerMove(8, 7);
-        assertEquals(1, game.currentPlayer().numEnemyStonesCaptured() );
+        assertEquals(1, game.currentPlayer().numStonesCaptured());
         game.nextTurn();
         assertEquals(false, game.isValidMove(game.currentPlayer(), 8, 8)); // ko rule
     }
 
     @Test
-    void testRepeatMove() { // test ko rule
+    void testRepeatMove() {                 // test ko rule
         Game game = new Game();
 
         game.playerMove(3, 3);
@@ -61,8 +61,8 @@ class GameTest {
         game.nextTurn();
         game.printGameState();
         assertEquals(true, game.isValidMove(game.currentPlayer(), 4, 3)); // capture
-        game.playerMove(4, 3);      // capture
-        assertEquals(game.currentPlayer().numEnemyStonesCaptured(), 1);
+        game.playerMove(4, 3);
+        assertEquals(game.currentPlayer().numStonesCaptured(), 1);
 
         game.nextTurn();
         assertEquals(false, game.isValidMove(game.currentPlayer(), 4, 4)); // ko rule
