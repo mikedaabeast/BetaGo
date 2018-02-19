@@ -1,8 +1,8 @@
-package com.company;
-import java.awt.*;
+package sample;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Set;
+import javafx.scene.paint.Color;
 
 public class Stone {
 

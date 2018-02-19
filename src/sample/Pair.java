@@ -1,4 +1,4 @@
-package com.company.Utility;
+package sample;
 
 public class Pair<K, V> {
 
@@ -21,7 +21,7 @@ public class Pair<K, V> {
     @Override
     public boolean equals(Object o) {
         Pair pair = (Pair) o;
-        return key.equals( pair.key ) && value.equals( pair.value );
+        return o != null && key.equals( pair.key ) && value.equals( pair.value );
     }
 
 }

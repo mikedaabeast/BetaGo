@@ -1,9 +1,8 @@
-package com.company;
-import java.awt.*;
+package sample;
 import java.util.*;
 import java.util.List;
 import java.util.LinkedList;
-import com.company.Utility.*;
+import javafx.scene.paint.Color;
 
 public class Board {
 
@@ -51,15 +50,12 @@ public class Board {
                 isValidMove = true;
 
             for (int i = 0; i < board.length; i++)                      // check if stone captured
-                for (int j = 0; j < board.length; j++) {
-                    Stone s = getStone(i, j);
-                    if(s != null && s.getColor() != color && Stone.getNumLiberties(s, new HashSet<>()) == 0)
+                for (int j = 0; j < board.length; j++)
+                    if(board[i][j] != null && board[i][j].getColor() != color && Stone.getNumLiberties(board[i][j], new HashSet<>()) == 0)
                         isValidMove = true;
-                }
-
         }
 
-        removeStoneFromBoard(row, col); // remove stone so board state not modified by isValidMove() method
+        removeStoneFromBoard(row, col);         // remove stone so board state not modified by isValidMove() method
         return isValidMove;
     }
 
@@ -72,20 +68,18 @@ public class Board {
                     stonesCaptured.add(new Pair<>(i, j));
 
         for (Pair p : stonesCaptured)
-            removeStoneFromBoard((int)p.getKey(), (int)p.getValue());
+            removeStoneFromBoard( (int) p.getKey(), (int) p.getValue() );
 
         return stonesCaptured.size();
     }
 
-    public int countCaptureStones(Color currPlayer) {
-        List<Pair<Integer, Integer>> stonesCaptured = new LinkedList<>();
-
+    public int countCapturedStones(Color currPlayer) {
+        int n = 0;
         for (int i = 0; i < board.length; i++)
-            for (int j = 0; j < board.length; j++)     // capture enemy stones
+            for (int j = 0; j < board.length; j++)
                 if (board[i][j] != null && board[i][j].getColor() != currPlayer && Stone.getNumLiberties(board[i][j], new HashSet<>()) == 0)
-                    stonesCaptured.add(new Pair<>(i, j));
-
-        return stonesCaptured.size();
+                    n++;
+        return n;
     }
 
     public Pair<Integer, Integer> captureSingleStone(Color currPlayer) {
@@ -93,8 +87,7 @@ public class Board {
             for (int j = 0; j < board.length; j++)     // capture enemy stones
                 if (board[i][j] != null && board[i][j].getColor() != currPlayer && Stone.getNumLiberties(board[i][j], new HashSet<>()) == 0)
                     return new Pair<>(i, j);
-
-        throw new RuntimeException("KEKS");
+        throw new RuntimeException("Oops");
     }
 
     private Stone createStone(int row, int col, Color color) {
@@ -143,30 +136,26 @@ public class Board {
     }
 
     private Stone getStone(int row, int col) {
-        if(!isValidLocation(row, col))
-            return null;
-        else
+        if (isValidLocation(row, col))
             return board[row][col];
+        return null;
     }
 
     private boolean isValidLocation(int row, int col) {
-        if(row < 0 || col < 0 || row >= board.length || col >= board.length)
-            return false;
-        else
-            return true;
+        return row >= 0 && col >= 0 && row < board.length && col < board.length;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("    ");
-        for (int i = 0; i < board.length; i++) sb.append(i + " ");
+        for (int i = 0; i < board.length; i++) sb.append(i).append(" ");
         sb.append("\n   ");
         for (int n = 0; n < board.length * 2 + 1; n++) sb.append("-");
         sb.append("\n");
 
         for (int i = 0; i < board.length; i++) {
-            sb.append(i + " | ");
+            sb.append(i).append(" | ");
             for (int j = 0; j < board.length; j++) {
                 if(board[i][j] == null)
                     sb.append(" ");
@@ -182,7 +171,18 @@ public class Board {
         sb.append("   ");
         for (int n = 0; n < board.length * 2 + 1; n++) sb.append("-");
         sb.append("\n");
+
         return sb.toString();
+    }
+
+    public void clearBoard() {
+        for (int i = 0; i < board.length; i++)
+            for (int j = 0; j < board.length; j++)
+                board[i][j] = null;
+    }
+
+    public int size() {
+        return board.length;
     }
 
     public Stone[][] getBoard() {   // used for testing purposes

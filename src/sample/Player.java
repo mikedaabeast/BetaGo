@@ -1,5 +1,5 @@
-package com.company;
-import java.awt.*;
+package sample;
+import javafx.scene.paint.Color;
 
 public class Player {
 
@@ -22,6 +22,10 @@ public class Player {
 
     public int numStonesCaptured() {
         return enemyStonesCaptured;
+    }
+
+    public void resetScore() {
+        enemyStonesCaptured = 0;
     }
 
     public String getName() {

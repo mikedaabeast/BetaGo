@@ -1,9 +1,9 @@
-package com.company.Test;
+package sample.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.company.Player;
+import sample.Player;
 import org.junit.jupiter.api.Test;
-import java.awt.*;
+import javafx.scene.paint.Color;
 
 class PlayerTest {
 

@@ -1,10 +1,10 @@
-package com.company.Test;
+package sample.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.company.Stone;
+import sample.Stone;
 import org.junit.jupiter.api.Test;
-import com.company.Board;
-import java.awt.*;
+import sample.Board;
+import javafx.scene.paint.Color;
 import java.util.HashSet;
 
 class BoardTest {
