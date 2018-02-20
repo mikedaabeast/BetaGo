@@ -135,19 +135,24 @@ public class Main extends Application {
         Button exitBtn = new Button("Exit");
         exitBtn.setOnAction(e -> System.exit(0));
 
+        Slider slider = new Slider(2, 30 , 9);
+        slider.valueProperty().addListener(e -> { game.setBoardSize((int)slider.getValue()); drawBoardState(); } );
+
         label = new Label("");
         updateLabel();
 
         GridPane topPane = new GridPane();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
             ColumnConstraints col = new ColumnConstraints();
-            col.setPercentWidth(100 / 4);
+            col.setPercentWidth(100 / 5);
             topPane.getColumnConstraints().add(col);
         }
         topPane.add(label, 0, 0);
         topPane.add(passTurnBtn, 1, 0);
         topPane.add(newGameBtn, 2, 0);
         topPane.add(exitBtn, 3, 0);
+        topPane.add(slider, 4, 0);
+
 
         GridPane gridpane = new GridPane();
         RowConstraints row1 = new RowConstraints();
