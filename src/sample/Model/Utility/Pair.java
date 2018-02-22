@@ -1,4 +1,4 @@
-package sample;
+package sample.Model.Utility;
 
 public class Pair<K, V> {
 

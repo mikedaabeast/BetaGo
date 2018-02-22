@@ -1,6 +1,6 @@
 package sample;
 import javafx.application.Application;
-import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -8,6 +8,9 @@ import javafx.scene.paint.*;
 import javafx.scene.canvas.*;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
+import sample.Model.Game;
+import sample.Model.Utility.Pair;
+import sample.Model.Stone;
 
 public class Main extends Application {
 
@@ -15,10 +18,7 @@ public class Main extends Application {
     private static final int HEIGHT = (int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2;
 
     private Game game;
-
-    private Label label;
-    private Canvas canvas;
-    private GraphicsContext gc;
+    private GamePlayView gamePlayView;
 
     public static void main(String[] args) {
         launch(args);
@@ -30,148 +30,158 @@ public class Main extends Application {
 
         StackPane root = new StackPane();
         root.setPrefSize(WIDTH, HEIGHT);
-        GridPane gridPane = createContentPane();
-        root.getChildren().add(gridPane);
+
+        gamePlayView = new GamePlayView();
+        root.getChildren().add(gamePlayView);
+
         primaryStage.setTitle("Go");
-        primaryStage.setScene(new Scene(root, WIDTH * 0.90, HEIGHT ));
+        primaryStage.setScene(new Scene(root, WIDTH * (1 / 0.70), HEIGHT ));
         primaryStage.show();
     }
 
-    private void attemptToPlaceStone(double x, double y) {
-        int row = (int)y;
-        int col = (int)x;
+    class GamePlayView extends GridPane {
 
-        if(game.isValidMove(row, col)) {
-            game.playerMove(row, col);
-            game.nextTurn();
-            drawBoardState();
+        private BoardView boardView;
+        private ControlPanel controlPanel;
+
+        GamePlayView() {
+            boardView = new BoardView(WIDTH, HEIGHT);
+            controlPanel = new ControlPanel();
+
+            ColumnConstraints col1 = new ColumnConstraints(70);
+            col1.setPercentWidth(70);
+            ColumnConstraints col2 = new ColumnConstraints(30);
+            col2.setPercentWidth(30);
+            getColumnConstraints().addAll(col1, col2);
+
+            add(boardView, 0, 0);
+            add(controlPanel, 1, 0);
+
+            setStyle("-fx-background-color: azure;");
+        }
+
+        public void updateEverything() {
+            boardView.drawBoardState();
+            controlPanel.updateLabel();
+        }
+
+    }
+
+    class BoardView extends Canvas {
+        private GraphicsContext gc;
+
+        BoardView(int width, int height) {
+            super(width, height);
+            gc = getGraphicsContext2D();
+
+            setOnMouseClicked(event -> {
+                double x = event.getX(), y = event.getY();
+                Pair<Double, Double> position = boardClickedAt(x, y);
+                attemptToPlaceStone(position.getKey(), position.getValue());
+            });
+            setOnMouseMoved(event -> {
+                Pair<Double, Double> position = boardClickedAt(event.getX(), event.getY());
+                double x = position.getKey(), y = position.getValue();
+                int row = (int)y, col = (int)x;
+                drawBoardState();
+                if(game.isValidMove(row, col)) {
+                    drawCircle(col, row, game.getCurrentPlayer().getColor());
+                }
+            });
+
+            drawBackground();
+        }
+
+        private void attemptToPlaceStone(double x, double y) {
+            int row = (int)y;
+            int col = (int)x;
+
+            if(game.isValidMove(row, col)) {
+                game.playerMove(row, col);
+                game.nextTurn();
+
+                gamePlayView.updateEverything();
+            }
+        }
+
+        private void drawBoardState() {
+            drawBackground();
+
+            Stone[][] stones = game.getBoard().getBoard();
+            for (int i = 0; i < stones.length; i++)
+                for (int j = 0; j < stones.length; j++)
+                    if(stones[i][j] != null)
+                        drawCircle(j, i, stones[i][j].getColor());
+        }
+
+        // final Image blackStone = new Image(Main.class.getResourceAsStream("blackStone.png"), 100, 100, true, false);
+        // final Image whiteStone = new Image(Main.class.getResourceAsStream("whiteStone.png"), 100, 100, true, false);
+        private void drawCircle(double x, double y, Paint p) {
+            int xOffset = (int)getWidth() / game.getBoardSize();
+            int yOffset = (int)getHeight() / game.getBoardSize();
+
+            gc.setFill(p);
+            gc.fillOval(x * xOffset, y * yOffset, xOffset, yOffset);
+            gc.setStroke(Color.GRAY);
+            gc.setLineWidth(1);
+            gc.strokeOval(x * xOffset, y * yOffset, xOffset, yOffset);
+        }
+
+        private Pair<Double, Double> boardClickedAt(double x , double y) {
+            x = (int)(x / (getWidth() / game.getBoardSize()));
+            y = (int)(y / (getHeight() / game.getBoardSize()));
+            return new Pair<>(x, y);
+        }
+
+        private void drawGridLines(int size) {
+            int xOffset = (int)(getWidth() / 1.0 / size);
+            int yOffset = (int)(getHeight() / 1.0 / size);
+            gc.setStroke(Color.BLACK);
+            gc.setLineWidth(1.5);
+
+            for (int i = 0; i < size; i++) {
+                gc.strokeLine(i * xOffset + xOffset / 2,  yOffset / 2, i * xOffset + xOffset / 2, getHeight() - yOffset / 2 - 1);
+                gc.strokeLine(xOffset / 2, i * yOffset + yOffset / 2, getWidth() - xOffset / 2 - 1, i * yOffset + yOffset / 2);
+            }
+        }
+
+        private void drawBackground() {
+            gc.setFill(new Color((double)186/255, (double)174/255, (double)125/255, (double)255/255));
+            gc.fillRect(0,0, getWidth(), getHeight());
+            drawGridLines(game.getBoardSize());
         }
     }
 
-    private void drawBoardState() {
-        drawBackground();
+    class ControlPanel extends VBox {
+        private Label label;
 
-        Stone[][] stones = game.getBoard().getBoard();
-        for (int i = 0; i < stones.length; i++)
-            for (int j = 0; j < stones.length; j++)
-                if(stones[i][j] != null)
-                    drawCircle(j, i, stones[i][j].getColor());
+         ControlPanel() {
+            Button passTurnBtn = new Button("Pass turn");
+            passTurnBtn.setOnAction(e -> System.out.println("Keks"));
 
-        updateLabel();
-    }
+            Button newGameBtn = new Button("New Game");
+            newGameBtn.setOnAction(e -> {
+                game.restartGame();
+                gamePlayView.updateEverything();
+            });
 
-    private void updateLabel() {
-        label.setFont(Font.font ("Verdana", 14));
-        label.setTextFill(Color.BLACK);
-        label.setText(game.getCurrentPlayer().getName() + "'s turn\nP1: " + game.getPlayers()[0].numStonesCaptured() + " P2: " + game.getPlayers()[1].numStonesCaptured());
-    }
+            Button exitBtn = new Button("Exit");
+            exitBtn.setOnAction(e -> System.exit(0));
 
-    private void drawCircle(double x, double y, Paint p) {
-        int xOffset = (int)canvas.getWidth() / game.getBoardSize();
-        int yOffset = (int)canvas.getHeight() / game.getBoardSize();
+            label = new Label("");
+            updateLabel();
+            label.setStyle("-fx-background-color: azure;");
 
-        gc.setFill(p);
-        gc.fillOval(x * xOffset, y * yOffset, xOffset, yOffset);
-        gc.setStroke(Color.GRAY);
-        gc.setLineWidth(1);
-        gc.strokeOval(x * xOffset, y * yOffset, xOffset, yOffset);
-    }
-
-    private Pair<Double, Double> boardClickedAt(double x , double y) {
-        x = (int)(x / (canvas.getWidth() / game.getBoardSize()));
-        y = (int)(y / (canvas.getHeight() / game.getBoardSize()));
-        return new Pair<>(x, y);
-    }
-
-    private void drawGridLines(int size) {
-        int xOffset = (int)(canvas.getWidth() / 1.0 / size);
-        int yOffset = (int)(canvas.getHeight() / 1.0 / size);
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(1.5);
-
-        for (int i = 0; i < size; i++) {
-            gc.strokeLine(i * xOffset + xOffset / 2,  yOffset / 2, i * xOffset + xOffset / 2, canvas.getHeight() - yOffset / 2 - 1);
-            gc.strokeLine(xOffset / 2, i * yOffset + yOffset / 2, canvas.getWidth() - xOffset / 2 - 1, i * yOffset + yOffset / 2);
+            getChildren().addAll(label, passTurnBtn, newGameBtn, exitBtn);
+            setSpacing(15);
+            setAlignment(Pos.CENTER);
         }
-    }
 
-    private void drawBackground() {
-        gc.setFill(new Color((double)186/255, (double)174/255, (double)125/255, (double)255/255));
-        gc.fillRect(0,0, canvas.getWidth(), canvas.getHeight());
-        drawGridLines(game.getBoardSize());
-    }
-
-    // GUI COMPONENTS AND EVENT LISTENERS
-    private GridPane createContentPane() {
-        canvas = new Canvas(WIDTH * 0.90, HEIGHT * 0.90);
-        gc = canvas.getGraphicsContext2D();
-
-        canvas.setOnMouseClicked(event -> {
-            double x = event.getX(), y = event.getY();
-            Pair<Double, Double> position = boardClickedAt(x, y);
-            attemptToPlaceStone(position.getKey(), position.getValue());
-        });
-
-        canvas.setOnMouseMoved(event -> {
-            Pair<Double, Double> position = boardClickedAt(event.getX(), event.getY());
-            double x = position.getKey(), y = position.getValue();
-            int row = (int)y, col = (int)x;
-            drawBoardState();
-            if(game.isValidMove(row, col))
-                drawCircle(col, row,game.getCurrentPlayer().getColor());
-        });
-
-        drawBackground();
-
-        Button passTurnBtn = new Button("Pass turn");
-        passTurnBtn.setOnAction(e -> System.out.println("Keks"));
-
-        Button newGameBtn = new Button("New Game");
-        newGameBtn.setOnAction(e -> {
-            game.restartGame();
-            drawBoardState();
-        });
-
-        Button exitBtn = new Button("Exit");
-        exitBtn.setOnAction(e -> System.exit(0));
-
-        Slider slider = new Slider(2, 30 , 9);
-        slider.valueProperty().addListener(e -> { game.setBoardSize((int)slider.getValue()); drawBoardState(); } );
-
-        label = new Label("");
-        updateLabel();
-
-        GridPane topPane = new GridPane();
-        for (int i = 0; i < 5; i++) {
-            ColumnConstraints col = new ColumnConstraints();
-            col.setPercentWidth(100 / 5);
-            topPane.getColumnConstraints().add(col);
+        private void updateLabel() {
+            label.setFont(Font.font ("Verdana", 14));
+            label.setTextFill(Color.BLACK);
+            label.setText(game.getCurrentPlayer().getName() + "'s turn\nP1: " + game.getPlayers()[0].numStonesCaptured() + " P2: " + game.getPlayers()[1].numStonesCaptured());
         }
-        topPane.add(label, 0, 0);
-        topPane.add(passTurnBtn, 1, 0);
-        topPane.add(newGameBtn, 2, 0);
-        topPane.add(exitBtn, 3, 0);
-        topPane.add(slider, 4, 0);
-
-
-        GridPane gridpane = new GridPane();
-        RowConstraints row1 = new RowConstraints();
-        row1.setPercentHeight(10);
-        RowConstraints row2 = new RowConstraints();
-        row2.setPercentHeight(90);
-        gridpane.getRowConstraints().addAll(row1, row2);
-
-        gridpane.add(topPane, 0, 0);
-        gridpane.add(canvas, 0, 1);
-
-        GridPane.setHalignment(label, HPos.CENTER);
-        GridPane.setHalignment(passTurnBtn, HPos.CENTER);
-        GridPane.setHalignment(newGameBtn, HPos.CENTER);
-        GridPane.setHalignment(exitBtn, HPos.CENTER);
-        GridPane.setHalignment(canvas, HPos.CENTER);
-        GridPane.setHalignment(topPane, HPos.CENTER);
-
-        return gridpane;
     }
 
 }

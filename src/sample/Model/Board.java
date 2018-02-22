@@ -1,8 +1,9 @@
-package sample;
+package sample.Model;
 import java.util.*;
 import java.util.List;
 import java.util.LinkedList;
 import javafx.scene.paint.Color;
+import sample.Model.Utility.Pair;
 
 public class Board {
 
