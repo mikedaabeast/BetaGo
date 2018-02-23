@@ -2,11 +2,12 @@ package sample;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.*;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
-import javafx.scene.canvas.*;
-import javafx.scene.text.*;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import sample.Model.Game;
 import sample.Model.Utility.Pair;
@@ -38,9 +39,18 @@ public class Main extends Application {
 
         displayScreen(gamePlayScreen);
 
+        root.getStylesheets().add("sample/stylesheet.css");
+        homeScreen.getStyleClass().add("homeScreen");
+
         primaryStage.setTitle("Go");
-        primaryStage.setScene(new Scene(root, WIDTH * (1 / 0.70), HEIGHT ));
+        primaryStage.setScene(new Scene(root, WIDTH * (1 / 0.80), HEIGHT ));
         primaryStage.show();
+
+    }
+
+    private void displayScreen(Node screen) {
+        root.getChildren().removeAll(root.getChildren());
+        root.getChildren().add(screen);
     }
 
     class GamePlayScreen extends GridPane {
@@ -52,10 +62,10 @@ public class Main extends Application {
             boardView = new BoardView(WIDTH, HEIGHT);
             controlPanel = new SidePanel();
 
-            ColumnConstraints col1 = new ColumnConstraints(70);
-            col1.setPercentWidth(70);
-            ColumnConstraints col2 = new ColumnConstraints(30);
-            col2.setPercentWidth(30);
+            ColumnConstraints col1 = new ColumnConstraints();
+            col1.setPercentWidth(80);
+            ColumnConstraints col2 = new ColumnConstraints();
+            col2.setPercentWidth(20);
             getColumnConstraints().addAll(col1, col2);
 
             add(boardView, 0, 0);
@@ -118,8 +128,6 @@ public class Main extends Application {
                         drawCircle(j, i, stones[i][j].getColor());
         }
 
-        // final Image blackStone = new Image(Main.class.getResourceAsStream("blackStone.png"), 100, 100, true, false);
-        // final Image whiteStone = new Image(Main.class.getResourceAsStream("whiteStone.png"), 100, 100, true, false);
         private void drawCircle(double x, double y, Paint p) {
             int xOffset = (int)getWidth() / game.getBoardSize();
             int yOffset = (int)getHeight() / game.getBoardSize();
@@ -176,30 +184,34 @@ public class Main extends Application {
             exitBtn.setOnAction(e -> System.exit(0));
 
             label = new Label("");
+            label.setFont(Font.font ("Verdana", 16));
+            label.setTextFill(Color.BLACK);
+            label.setMinWidth(WIDTH * 0.20);
+            label.getStyleClass().add("label");
             updateLabel();
 
+            passTurnBtn.setMinWidth(WIDTH * 0.20);
+            newGameBtn.setMinWidth(WIDTH * 0.20);
+            homeScreenBtn.setMinWidth(WIDTH * 0.20);
+            exitBtn.setMinWidth(WIDTH * 0.20);
+
+            getStyleClass().add("sidePanel");
             getChildren().addAll(label, passTurnBtn, newGameBtn, homeScreenBtn, exitBtn);
             setSpacing(15);
             setAlignment(Pos.CENTER);
         }
 
         private void updateLabel() {
-            label.setFont(Font.font ("Verdana", 14));
-            label.setTextFill(Color.BLACK);
             label.setText(game.getCurrentPlayer().getName() + "'s turn\nP1: " + game.getPlayers()[0].numStonesCaptured() + " P2: " + game.getPlayers()[1].numStonesCaptured());
-        }
-    }
-
-    private void displayScreen(Node screen) {
-        root.getChildren().removeAll(root.getChildren());
-        root.getChildren().add(screen);
+         }
     }
 
     class HomeScreen extends VBox {
         HomeScreen() {
-            Button newGameBtn = new Button("New Game");
+            Button newGameBtn = new Button("Play Game");
             newGameBtn.setOnAction(e -> displayScreen(gamePlayScreen));
-
+//            final Image image = new Image(Main.class.getResourceAsStream("../images/mssz.png"), HEIGHT, HEIGHT * 0.7, true, true);
+//            newGameBtn.setGraphic(new ImageView(image));
             getChildren().add(newGameBtn);
             setAlignment(Pos.CENTER);
             setStyle("-fx-background-color: azure;");
