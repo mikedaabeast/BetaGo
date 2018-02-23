@@ -98,8 +98,7 @@ public class Main extends Application {
         }
 
         private void attemptToPlaceStone(double x, double y) {
-            int row = (int)y;
-            int col = (int)x;
+            int row = (int)y, col = (int)x;
 
             if(game.isValidMove(row, col)) {
                 game.playerMove(row, col);
@@ -127,19 +126,19 @@ public class Main extends Application {
 
             gc.setFill(p);
             gc.fillOval(x * xOffset, y * yOffset, xOffset, yOffset);
-            gc.setStroke(Color.GRAY);
             gc.setLineWidth(1);
+            gc.setStroke(Color.GRAY);
             gc.strokeOval(x * xOffset, y * yOffset, xOffset, yOffset);
         }
 
         private Pair<Double, Double> boardClickedAt(double x , double y) {
-            x = (int)(x / (getWidth() / game.getBoardSize()));
+            x = (int)(x / (getWidth()  / game.getBoardSize()));
             y = (int)(y / (getHeight() / game.getBoardSize()));
             return new Pair<>(x, y);
         }
 
         private void drawGridLines(int size) {
-            int xOffset = (int)(getWidth() / 1.0 / size);
+            int xOffset = (int)(getWidth()  / 1.0 / size);
             int yOffset = (int)(getHeight() / 1.0 / size);
             gc.setStroke(Color.BLACK);
             gc.setLineWidth(1.5);
@@ -170,15 +169,14 @@ public class Main extends Application {
                 gamePlayScreen.updateEverything();
             });
 
-             Button homeScreenBtn = new Button("Home Screen");
-             homeScreenBtn.setOnAction(e -> displayScreen(homeScreen));
+            Button homeScreenBtn = new Button("Home Screen");
+            homeScreenBtn.setOnAction(e -> displayScreen(homeScreen));
 
             Button exitBtn = new Button("Exit");
             exitBtn.setOnAction(e -> System.exit(0));
 
             label = new Label("");
             updateLabel();
-            label.setStyle("-fx-background-color: azure;");
 
             getChildren().addAll(label, passTurnBtn, newGameBtn, homeScreenBtn, exitBtn);
             setSpacing(15);
