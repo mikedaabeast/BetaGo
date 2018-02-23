@@ -18,7 +18,9 @@ public class Main extends Application {
     private static final int HEIGHT = (int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2;
 
     private Game game;
-    private GamePlayView gamePlayView;
+    private GamePlayScreen gamePlayScreen;
+    private HomeScreen homeScreen;
+    private StackPane root;
 
     public static void main(String[] args) {
         launch(args);
@@ -26,27 +28,29 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        game = new Game();
+        game = new Game();                      // model
 
-        StackPane root = new StackPane();
+        gamePlayScreen = new GamePlayScreen();  // view
+        homeScreen = new HomeScreen();
+
+        root = new StackPane();
         root.setPrefSize(WIDTH, HEIGHT);
 
-        gamePlayView = new GamePlayView();
-        root.getChildren().add(gamePlayView);
+        displayScreen(gamePlayScreen);
 
         primaryStage.setTitle("Go");
         primaryStage.setScene(new Scene(root, WIDTH * (1 / 0.70), HEIGHT ));
         primaryStage.show();
     }
 
-    class GamePlayView extends GridPane {
+    class GamePlayScreen extends GridPane {
 
         private BoardView boardView;
-        private ControlPanel controlPanel;
+        private SidePanel controlPanel;
 
-        GamePlayView() {
+        GamePlayScreen() {
             boardView = new BoardView(WIDTH, HEIGHT);
-            controlPanel = new ControlPanel();
+            controlPanel = new SidePanel();
 
             ColumnConstraints col1 = new ColumnConstraints(70);
             col1.setPercentWidth(70);
@@ -79,6 +83,7 @@ public class Main extends Application {
                 Pair<Double, Double> position = boardClickedAt(x, y);
                 attemptToPlaceStone(position.getKey(), position.getValue());
             });
+
             setOnMouseMoved(event -> {
                 Pair<Double, Double> position = boardClickedAt(event.getX(), event.getY());
                 double x = position.getKey(), y = position.getValue();
@@ -100,7 +105,7 @@ public class Main extends Application {
                 game.playerMove(row, col);
                 game.nextTurn();
 
-                gamePlayView.updateEverything();
+                gamePlayScreen.updateEverything();
             }
         }
 
@@ -152,18 +157,21 @@ public class Main extends Application {
         }
     }
 
-    class ControlPanel extends VBox {
+    class SidePanel extends VBox {
         private Label label;
 
-         ControlPanel() {
+         SidePanel() {
             Button passTurnBtn = new Button("Pass turn");
             passTurnBtn.setOnAction(e -> System.out.println("Keks"));
 
             Button newGameBtn = new Button("New Game");
             newGameBtn.setOnAction(e -> {
                 game.restartGame();
-                gamePlayView.updateEverything();
+                gamePlayScreen.updateEverything();
             });
+
+             Button homeScreenBtn = new Button("Home Screen");
+             homeScreenBtn.setOnAction(e -> displayScreen(homeScreen));
 
             Button exitBtn = new Button("Exit");
             exitBtn.setOnAction(e -> System.exit(0));
@@ -172,7 +180,7 @@ public class Main extends Application {
             updateLabel();
             label.setStyle("-fx-background-color: azure;");
 
-            getChildren().addAll(label, passTurnBtn, newGameBtn, exitBtn);
+            getChildren().addAll(label, passTurnBtn, newGameBtn, homeScreenBtn, exitBtn);
             setSpacing(15);
             setAlignment(Pos.CENTER);
         }
@@ -181,6 +189,22 @@ public class Main extends Application {
             label.setFont(Font.font ("Verdana", 14));
             label.setTextFill(Color.BLACK);
             label.setText(game.getCurrentPlayer().getName() + "'s turn\nP1: " + game.getPlayers()[0].numStonesCaptured() + " P2: " + game.getPlayers()[1].numStonesCaptured());
+        }
+    }
+
+    private void displayScreen(Node screen) {
+        root.getChildren().removeAll(root.getChildren());
+        root.getChildren().add(screen);
+    }
+
+    class HomeScreen extends VBox {
+        HomeScreen() {
+            Button newGameBtn = new Button("New Game");
+            newGameBtn.setOnAction(e -> displayScreen(gamePlayScreen));
+
+            getChildren().add(newGameBtn);
+            setAlignment(Pos.CENTER);
+            setStyle("-fx-background-color: azure;");
         }
     }
 
