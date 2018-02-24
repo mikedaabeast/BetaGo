@@ -4,6 +4,7 @@ import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.canvas.*;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
 import javafx.stage.Stage;
@@ -27,17 +28,14 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        game = new Game();                      // model
-
-        gamePlayScreen = new GamePlayScreen();  // view
+        game = new Game();
+        gamePlayScreen = new GamePlayScreen();
         homeScreen = new HomeScreen();
 
         root = new StackPane();
         root.setPrefSize(WIDTH, HEIGHT);
-
-        displayScreen(gamePlayScreen);
-
         root.getStylesheets().add("sample/stylesheet.css");
+        displayScreen(gamePlayScreen);
 
         primaryStage.setTitle("Go");
         primaryStage.setScene(new Scene(root, WIDTH * (1 / 0.80), HEIGHT ));
@@ -81,6 +79,7 @@ public class Main extends Application {
 
         BoardView(int width, int height) {
             super(width, height);
+            getStyleClass().add("boardView");
             gc = getGraphicsContext2D();
 
             setOnMouseClicked(event -> {
@@ -89,14 +88,15 @@ public class Main extends Application {
                 attemptToPlaceStone(position.getKey(), position.getValue());
             });
 
+            setOnMouseExited(event -> drawBoardState());
+
             setOnMouseMoved(event -> {
                 Pair<Double, Double> position = boardClickedAt(event.getX(), event.getY());
                 double x = position.getKey(), y = position.getValue();
                 int row = (int)y, col = (int)x;
                 drawBoardState();
-                if(game.isValidMove(row, col)) {
+                if(game.isValidMove(row, col))
                     drawCircle(col, row, game.getCurrentPlayer().getColor());
-                }
             });
 
             drawBackground();
@@ -152,9 +152,9 @@ public class Main extends Application {
             }
         }
 
+        Image image = new Image(Main.class.getResourceAsStream("../images/background.jpg"));
         private void drawBackground() {
-            gc.setFill(new Color((double)186/255, (double)174/255, (double)125/255, (double)255/255));
-            gc.fillRect(0,0, getWidth(), getHeight());
+            gc.drawImage(image, 0, 0, WIDTH, HEIGHT);
             drawGridLines(game.getBoardSize());
         }
     }
@@ -163,14 +163,7 @@ public class Main extends Application {
         private Label label;
 
          SidePanel() {
-            Button passTurnBtn = new Button("Pass turn");
-            passTurnBtn.setOnAction(e -> { game.passTurn(); gamePlayScreen.updateEverything(); });
-
-            Button newGameBtn = new Button("New Game");
-            newGameBtn.setOnAction(e -> {
-                game.restartGame();
-                gamePlayScreen.updateEverything();
-            });
+            getStyleClass().add("sidePanel");
 
             Button homeScreenBtn = new Button("Home Screen");
             homeScreenBtn.setOnAction(e -> displayScreen(homeScreen));
@@ -178,12 +171,21 @@ public class Main extends Application {
             Button exitBtn = new Button("Quit");
             exitBtn.setOnAction(e -> System.exit(0));
 
-            label = new Label("");
-            label.setTextFill(Color.BLACK);
-            label.setMinWidth(WIDTH * 0.20);
-            label.setMaxWidth(WIDTH * 0.20);
+            Button passTurnBtn = new Button("Pass turn");
+            passTurnBtn.setOnAction(e -> {
+                game.passTurn();
+                gamePlayScreen.updateEverything();
+            });
 
+            Button newGameBtn = new Button("New Game");
+            newGameBtn.setOnAction(e -> {
+                game.restartGame();
+                gamePlayScreen.updateEverything();
+            });
+
+            label = new Label("");
             label.getStyleClass().add("label");
+            label.setPrefWidth(WIDTH * 0.20);
             updateLabel();
 
             passTurnBtn.setMinWidth(WIDTH * 0.20);
@@ -191,14 +193,13 @@ public class Main extends Application {
             homeScreenBtn.setMinWidth(WIDTH * 0.20);
             exitBtn.setMinWidth(WIDTH * 0.20);
 
-            passTurnBtn.setMinHeight(HEIGHT * 0.08);
-            newGameBtn.setMinHeight(HEIGHT * 0.08);
-            homeScreenBtn.setMinHeight(HEIGHT * 0.08);
-            exitBtn.setMinHeight(HEIGHT * 0.08);
+            passTurnBtn.setMinHeight(HEIGHT * 0.06);
+            newGameBtn.setMinHeight(HEIGHT * 0.06);
+            homeScreenBtn.setMinHeight(HEIGHT * 0.06);
+            exitBtn.setMinHeight(HEIGHT * 0.06);
 
-            getStyleClass().add("sidePanel");
             getChildren().addAll(label, passTurnBtn, newGameBtn, homeScreenBtn, exitBtn);
-            setSpacing(15);
+            setSpacing(5);
             setAlignment(Pos.CENTER);
         }
 
@@ -209,18 +210,22 @@ public class Main extends Application {
 
     class HomeScreen extends VBox {
         HomeScreen() {
+            getStyleClass().add("homeScreen");
+
             Button newGameBtn = new Button("Play Game");
             newGameBtn.setOnAction(e -> displayScreen(gamePlayScreen));
+            newGameBtn.setMinWidth(WIDTH * .5);
+            newGameBtn.getStyleClass().add("homeScreenButton");
+
+
             Button exitBtn = new Button("Quit");
             exitBtn.setOnAction(e -> System.exit(0));
             exitBtn.setMinWidth(WIDTH * .5);
-            newGameBtn.setMinWidth(WIDTH * .5);
             exitBtn.getStyleClass().add("homeScreenButton");
-            newGameBtn.getStyleClass().add("homeScreenButton");
 
             getChildren().addAll(newGameBtn, exitBtn);
+            setSpacing(5);
             setAlignment(Pos.CENTER);
-            getStyleClass().add("homeScreen");
         }
     }
 
