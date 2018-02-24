@@ -2,12 +2,10 @@ package sample;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.*;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.canvas.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import sample.Model.Game;
 import sample.Model.Utility.Pair;
@@ -40,7 +38,6 @@ public class Main extends Application {
         displayScreen(gamePlayScreen);
 
         root.getStylesheets().add("sample/stylesheet.css");
-        homeScreen.getStyleClass().add("homeScreen");
 
         primaryStage.setTitle("Go");
         primaryStage.setScene(new Scene(root, WIDTH * (1 / 0.80), HEIGHT ));
@@ -70,8 +67,6 @@ public class Main extends Application {
 
             add(boardView, 0, 0);
             add(controlPanel, 1, 0);
-
-            setStyle("-fx-background-color: azure;");
         }
 
         public void updateEverything() {
@@ -169,7 +164,7 @@ public class Main extends Application {
 
          SidePanel() {
             Button passTurnBtn = new Button("Pass turn");
-            passTurnBtn.setOnAction(e -> System.out.println("Keks"));
+            passTurnBtn.setOnAction(e -> { game.passTurn(); gamePlayScreen.updateEverything(); });
 
             Button newGameBtn = new Button("New Game");
             newGameBtn.setOnAction(e -> {
@@ -180,13 +175,14 @@ public class Main extends Application {
             Button homeScreenBtn = new Button("Home Screen");
             homeScreenBtn.setOnAction(e -> displayScreen(homeScreen));
 
-            Button exitBtn = new Button("Exit");
+            Button exitBtn = new Button("Quit");
             exitBtn.setOnAction(e -> System.exit(0));
 
             label = new Label("");
-            label.setFont(Font.font ("Verdana", 16));
             label.setTextFill(Color.BLACK);
             label.setMinWidth(WIDTH * 0.20);
+            label.setMaxWidth(WIDTH * 0.20);
+
             label.getStyleClass().add("label");
             updateLabel();
 
@@ -194,6 +190,11 @@ public class Main extends Application {
             newGameBtn.setMinWidth(WIDTH * 0.20);
             homeScreenBtn.setMinWidth(WIDTH * 0.20);
             exitBtn.setMinWidth(WIDTH * 0.20);
+
+            passTurnBtn.setMinHeight(HEIGHT * 0.08);
+            newGameBtn.setMinHeight(HEIGHT * 0.08);
+            homeScreenBtn.setMinHeight(HEIGHT * 0.08);
+            exitBtn.setMinHeight(HEIGHT * 0.08);
 
             getStyleClass().add("sidePanel");
             getChildren().addAll(label, passTurnBtn, newGameBtn, homeScreenBtn, exitBtn);
@@ -210,11 +211,16 @@ public class Main extends Application {
         HomeScreen() {
             Button newGameBtn = new Button("Play Game");
             newGameBtn.setOnAction(e -> displayScreen(gamePlayScreen));
-//            final Image image = new Image(Main.class.getResourceAsStream("../images/mssz.png"), HEIGHT, HEIGHT * 0.7, true, true);
-//            newGameBtn.setGraphic(new ImageView(image));
-            getChildren().add(newGameBtn);
+            Button exitBtn = new Button("Quit");
+            exitBtn.setOnAction(e -> System.exit(0));
+            exitBtn.setMinWidth(WIDTH * .5);
+            newGameBtn.setMinWidth(WIDTH * .5);
+            exitBtn.getStyleClass().add("homeScreenButton");
+            newGameBtn.getStyleClass().add("homeScreenButton");
+
+            getChildren().addAll(newGameBtn, exitBtn);
             setAlignment(Pos.CENTER);
-            setStyle("-fx-background-color: azure;");
+            getStyleClass().add("homeScreen");
         }
     }
 

@@ -7,6 +7,7 @@ public class Game {
     private Board board;
     private int turn;
     private MoveData prevMove;  // ko rule
+    private boolean lastTurnPassed;
 
     public Game() {
         players = new Player[]{
@@ -27,18 +28,18 @@ public class Game {
     }
 
     private boolean isRepeatBoardPosition(int row, int col, Color color) {
+        boolean isRepeatPosition = false;
+
         board.placeStoneOnBoard(row, col, color);                        // make move
         if (board.countCapturedStones(color) == 1) {
             Pair<Integer, Integer> capturedStone = board.captureSingleStone(color);
             MoveData currMove = new MoveData(capturedStone, 1);
-            if (prevMove != null && currMove.equals(prevMove)) {                          // check for ko rule
-                board.removeStoneFromBoard(row, col);
-                return true;
-            }
-            prevMove = new MoveData(row, col, 1);
+            if (prevMove != null && currMove.equals(prevMove))                           // check for ko rule
+                isRepeatPosition = true;
         }
+
         board.removeStoneFromBoard(row, col);                                               // undo move
-        return false;
+        return isRepeatPosition;
     }
 
     public void playerMove(int row, int col) {
@@ -54,7 +55,16 @@ public class Game {
         int numStonesCaptured = board.captureStones(currentPlayer.getColor());      // capture enemy stones
         currentPlayer.incrementStonesCaptured(numStonesCaptured);                   // increment score by # stones captured
 
+        prevMove = new MoveData(row, col, numStonesCaptured);
+        lastTurnPassed = false;
+
         System.out.println(toString());
+    }
+
+    public void passTurn() {
+        if(lastTurnPassed) System.exit(0);
+        nextTurn();
+        lastTurnPassed = true;
     }
 
     public void nextTurn() {
