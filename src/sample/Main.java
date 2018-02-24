@@ -1,16 +1,14 @@
 package sample;
 import javafx.application.Application;
-import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.canvas.*;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
+import javafx.scene.image.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
 import javafx.stage.Stage;
-import sample.Model.Game;
-import sample.Model.Utility.Pair;
-import sample.Model.Stone;
+import sample.Model.*;
+import sample.Model.Utility.*;
 
 public class Main extends Application {
 
@@ -18,9 +16,7 @@ public class Main extends Application {
     private static final int HEIGHT = (int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2;
 
     private Game game;
-    private GamePlayScreen gamePlayScreen;
-    private HomeScreen homeScreen;
-    private StackPane root;
+    private GameView gameView;
 
     public static void main(String[] args) {
         launch(args);
@@ -29,33 +25,53 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         game = new Game();
-        gamePlayScreen = new GamePlayScreen();
-        homeScreen = new HomeScreen();
 
-        root = new StackPane();
-        root.setPrefSize(WIDTH, HEIGHT);
-        root.getStylesheets().add("sample/stylesheet.css");
-        displayScreen(gamePlayScreen);
+        gameView = new GameView();
+        gameView.setPrefSize(WIDTH, HEIGHT);
+        gameView.getStylesheets().add("sample/stylesheet.css");
+        gameView.displayGamePlayScreen();
 
         primaryStage.setTitle("Go");
-        primaryStage.setScene(new Scene(root, WIDTH * (1 / 0.80), HEIGHT ));
+        primaryStage.setScene(new Scene(gameView, WIDTH * (1 / 0.80), HEIGHT ));
         primaryStage.show();
-
     }
 
-    private void displayScreen(Node screen) {
-        root.getChildren().removeAll(root.getChildren());
-        root.getChildren().add(screen);
+    class GameView extends StackPane {
+
+        private GamePlayScreen gamePlayScreen;
+        private HomeScreen homeScreen;
+
+        GameView() {
+            gamePlayScreen = new GamePlayScreen();
+            homeScreen = new HomeScreen();
+        }
+
+        public void displayHomeScreen() {
+            displayScreen(homeScreen);
+        }
+
+        public void displayGamePlayScreen() {
+            displayScreen(gamePlayScreen);
+        }
+
+        public void updateGamePlayScreen() {
+            gamePlayScreen.update();
+        }
+
+        private void displayScreen(Node screen) {
+            this.getChildren().removeAll(this.getChildren());
+            this.getChildren().add(screen);
+        }
     }
 
     class GamePlayScreen extends GridPane {
 
         private BoardView boardView;
-        private SidePanel controlPanel;
+        private SidePanel sidePanel;
 
         GamePlayScreen() {
             boardView = new BoardView(WIDTH, HEIGHT);
-            controlPanel = new SidePanel();
+            sidePanel = new SidePanel();
 
             ColumnConstraints col1 = new ColumnConstraints();
             col1.setPercentWidth(80);
@@ -64,12 +80,12 @@ public class Main extends Application {
             getColumnConstraints().addAll(col1, col2);
 
             add(boardView, 0, 0);
-            add(controlPanel, 1, 0);
+            add(sidePanel, 1, 0);
         }
 
-        public void updateEverything() {
+        public void update() {
             boardView.drawBoardState();
-            controlPanel.updateLabel();
+            sidePanel.updateLabel();
         }
 
     }
@@ -83,33 +99,33 @@ public class Main extends Application {
             gc = getGraphicsContext2D();
 
             setOnMouseClicked(event -> {
-                double x = event.getX(), y = event.getY();
-                Pair<Double, Double> position = boardClickedAt(x, y);
-                attemptToPlaceStone(position.getKey(), position.getValue());
+                Pair<Integer, Integer> position = boardClickedAt(event.getX(), event.getY());
+                int row = position.getValue(), col = position.getKey();
+
+                attemptToPlaceStone(row, col);
+            });
+
+            setOnMouseMoved(event -> {
+                Pair<Integer, Integer> position = boardClickedAt(event.getX(), event.getY());
+                int row = position.getValue(), col = position.getKey();
+
+                if(game.isValidMove(row, col)) {
+                    drawBoardState();                                           // draw board on top of previously drawn valid move
+                    drawCircle(row, col, game.getCurrentPlayer().getColor());   // draw valid move on top of board
+                }
             });
 
             setOnMouseExited(event -> drawBoardState());
 
-            setOnMouseMoved(event -> {
-                Pair<Double, Double> position = boardClickedAt(event.getX(), event.getY());
-                double x = position.getKey(), y = position.getValue();
-                int row = (int)y, col = (int)x;
-                drawBoardState();
-                if(game.isValidMove(row, col))
-                    drawCircle(col, row, game.getCurrentPlayer().getColor());
-            });
-
             drawBackground();
         }
 
-        private void attemptToPlaceStone(double x, double y) {
-            int row = (int)y, col = (int)x;
-
+        private void attemptToPlaceStone(int row, int col) {
             if(game.isValidMove(row, col)) {
                 game.playerMove(row, col);
                 game.nextTurn();
 
-                gamePlayScreen.updateEverything();
+                gameView.updateGamePlayScreen();
             }
         }
 
@@ -120,24 +136,24 @@ public class Main extends Application {
             for (int i = 0; i < stones.length; i++)
                 for (int j = 0; j < stones.length; j++)
                     if(stones[i][j] != null)
-                        drawCircle(j, i, stones[i][j].getColor());
+                        drawCircle(i, j, stones[i][j].getColor());
         }
 
-        private void drawCircle(double x, double y, Paint p) {
-            int xOffset = (int)getWidth() / game.getBoardSize();
+        private void drawCircle(double row, double col, Paint p) {
+            int xOffset = (int)getWidth()  / game.getBoardSize();
             int yOffset = (int)getHeight() / game.getBoardSize();
 
             gc.setFill(p);
-            gc.fillOval(x * xOffset, y * yOffset, xOffset, yOffset);
+            gc.fillOval(col * xOffset, row * yOffset, xOffset, yOffset);
             gc.setLineWidth(1);
             gc.setStroke(Color.GRAY);
-            gc.strokeOval(x * xOffset, y * yOffset, xOffset, yOffset);
+            gc.strokeOval(col * xOffset, row * yOffset, xOffset, yOffset);
         }
 
-        private Pair<Double, Double> boardClickedAt(double x , double y) {
-            x = (int)(x / (getWidth()  / game.getBoardSize()));
-            y = (int)(y / (getHeight() / game.getBoardSize()));
-            return new Pair<>(x, y);
+        private Pair<Integer, Integer> boardClickedAt(double x , double y) {
+            x = (x / (getWidth()  / game.getBoardSize()));
+            y = (y / (getHeight() / game.getBoardSize()));
+            return new Pair<>((int)x, (int)y);
         }
 
         private void drawGridLines(int size) {
@@ -147,8 +163,8 @@ public class Main extends Application {
             gc.setLineWidth(1.5);
 
             for (int i = 0; i < size; i++) {
-                gc.strokeLine(i * xOffset + xOffset / 2,  yOffset / 2, i * xOffset + xOffset / 2, getHeight() - yOffset / 2 - 1);
-                gc.strokeLine(xOffset / 2, i * yOffset + yOffset / 2, getWidth() - xOffset / 2 - 1, i * yOffset + yOffset / 2);
+                gc.strokeLine(i * xOffset + xOffset / 2,  yOffset / 2, i * xOffset + xOffset / 2, game.getBoardSize() * yOffset - yOffset / 2 - 1);
+                gc.strokeLine(xOffset / 2, i * yOffset + yOffset / 2, game.getBoardSize() * xOffset - xOffset / 2 - 1, i * yOffset + yOffset / 2);
             }
         }
 
@@ -166,7 +182,7 @@ public class Main extends Application {
             getStyleClass().add("sidePanel");
 
             Button homeScreenBtn = new Button("Home Screen");
-            homeScreenBtn.setOnAction(e -> displayScreen(homeScreen));
+            homeScreenBtn.setOnAction(e -> gameView.displayHomeScreen());
 
             Button exitBtn = new Button("Quit");
             exitBtn.setOnAction(e -> System.exit(0));
@@ -174,13 +190,13 @@ public class Main extends Application {
             Button passTurnBtn = new Button("Pass turn");
             passTurnBtn.setOnAction(e -> {
                 game.passTurn();
-                gamePlayScreen.updateEverything();
+                gameView.updateGamePlayScreen();
             });
 
             Button newGameBtn = new Button("New Game");
             newGameBtn.setOnAction(e -> {
                 game.restartGame();
-                gamePlayScreen.updateEverything();
+                gameView.updateGamePlayScreen();
             });
 
             label = new Label("");
@@ -188,19 +204,12 @@ public class Main extends Application {
             label.setPrefWidth(WIDTH * 0.20);
             updateLabel();
 
-            passTurnBtn.setMinWidth(WIDTH * 0.20);
-            newGameBtn.setMinWidth(WIDTH * 0.20);
-            homeScreenBtn.setMinWidth(WIDTH * 0.20);
-            exitBtn.setMinWidth(WIDTH * 0.20);
-
-            passTurnBtn.setMinHeight(HEIGHT * 0.06);
-            newGameBtn.setMinHeight(HEIGHT * 0.06);
-            homeScreenBtn.setMinHeight(HEIGHT * 0.06);
-            exitBtn.setMinHeight(HEIGHT * 0.06);
+            for(Button button : new Button[]{passTurnBtn, newGameBtn, homeScreenBtn, exitBtn}) {
+                button.setMinWidth(WIDTH * 0.20);
+                button.setMinHeight(HEIGHT * 0.06);
+            }
 
             getChildren().addAll(label, passTurnBtn, newGameBtn, homeScreenBtn, exitBtn);
-            setSpacing(5);
-            setAlignment(Pos.CENTER);
         }
 
         private void updateLabel() {
@@ -212,20 +221,18 @@ public class Main extends Application {
         HomeScreen() {
             getStyleClass().add("homeScreen");
 
-            Button newGameBtn = new Button("Play Game");
-            newGameBtn.setOnAction(e -> displayScreen(gamePlayScreen));
-            newGameBtn.setMinWidth(WIDTH * .5);
-            newGameBtn.getStyleClass().add("homeScreenButton");
-
+            Button newGameBtn = new Button("New Game");
+            newGameBtn.setOnAction(e -> gameView.displayGamePlayScreen());
 
             Button exitBtn = new Button("Quit");
             exitBtn.setOnAction(e -> System.exit(0));
-            exitBtn.setMinWidth(WIDTH * .5);
-            exitBtn.getStyleClass().add("homeScreenButton");
+
+            for(Button button : new Button[]{newGameBtn, exitBtn}) {
+                button.getStyleClass().add("homeScreenButton");
+                button.setMinWidth(WIDTH * .5);
+            }
 
             getChildren().addAll(newGameBtn, exitBtn);
-            setSpacing(5);
-            setAlignment(Pos.CENTER);
         }
     }
 
