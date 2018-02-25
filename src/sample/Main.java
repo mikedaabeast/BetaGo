@@ -111,7 +111,11 @@ public class Main extends Application {
 
                 if(game.isValidMove(row, col)) {
                     drawBoardState();                                           // draw board on top of previously drawn valid move
-                    drawCircle(row, col, game.getCurrentPlayer().getColor());   // draw valid move on top of board
+                                                                                // draw valid move on top of board
+                    if(game.getCurrentPlayer().getColor() == Color.WHITE)
+                        drawCircle(row, col, new Color(1, 1, 1, 0.5));
+                    else
+                        drawCircle(row, col, new Color(0, 0, 0, 0.5));
                 }
             });
 
@@ -145,9 +149,6 @@ public class Main extends Application {
 
             gc.setFill(p);
             gc.fillOval(col * xOffset, row * yOffset, xOffset, yOffset);
-            gc.setLineWidth(1);
-            gc.setStroke(Color.GRAY);
-            gc.strokeOval(col * xOffset, row * yOffset, xOffset, yOffset);
         }
 
         private Pair<Integer, Integer> boardClickedAt(double x , double y) {
@@ -207,6 +208,7 @@ public class Main extends Application {
             for(Button button : new Button[]{passTurnBtn, newGameBtn, homeScreenBtn, exitBtn}) {
                 button.setMinWidth(WIDTH * 0.20);
                 button.setMinHeight(HEIGHT * 0.06);
+                button.getStyleClass().add("sidePanelButton");
             }
 
             getChildren().addAll(label, passTurnBtn, newGameBtn, homeScreenBtn, exitBtn);

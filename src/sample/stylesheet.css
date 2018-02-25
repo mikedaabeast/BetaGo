@@ -1,14 +1,11 @@
 .root {
-    -fx-background: rgb(132, 145, 47);
-    -fx-base: rgb(215, 228, 203);
+    -fx-base: rgb(132, 145, 47);
 }
 
 .sidePanel{
      -fx-alignment: center;
      -fx-spacing: 10;
-     -fx-background-color: lightcyan;
      -fx-background-image: url("../images/background.jpg");
-     -fx-base: rgb(132, 145, 47);
  }
 
 .homeScreen{
@@ -28,6 +25,13 @@
 
 .homeScreenButton {
     -fx-font-size: 32pt;
+    -fx-font-weight: bold;
+    -fx-font-family: "Courier New";
+}
+
+.sidePanelButton {
+    -fx-font-size: 12pt;
+    -fx-font-weight: bold;
     -fx-font-family: "Courier New";
 }
 
