@@ -168,7 +168,7 @@ public class Main extends Application {
             }
         }
 
-        Image image = new Image(Main.class.getResourceAsStream("../images/background.jpg"));
+        Image image = new Image(Main.class.getResourceAsStream("../images/wood1.jpg"));
         private void drawBackground() {
             gc.drawImage(image, 0, 0, WIDTH, HEIGHT);
             drawGridLines(game.getBoardSize());
