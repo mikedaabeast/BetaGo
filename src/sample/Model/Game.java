@@ -44,7 +44,7 @@ public class Game {
 
     public void playerMove(int row, int col) {
         Player currentPlayer = getCurrentPlayer();
-        System.out.println((currentPlayer.getColor() == Color.WHITE ? "WHITE" : "BLACK") + " attempt to place stone at [" + row + "," + col + "]");
+        // System.out.println((currentPlayer.getColor() == Color.WHITE ? "WHITE" : "BLACK") + " attempt to place stone at [" + row + "," + col + "]");
 
         if (!isValidMove(row, col)) {
             System.out.println("INVALID MOVE!! TRY AGAIN!");
@@ -57,8 +57,7 @@ public class Game {
 
         prevMove = new MoveData(row, col, numStonesCaptured);
         lastTurnPassed = false;
-
-        System.out.println(toString());
+        // System.out.println(toString());
     }
 
     public void passTurn() {

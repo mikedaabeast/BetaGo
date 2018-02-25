@@ -194,7 +194,7 @@ public class Main extends Application {
                 gameView.updateGamePlayScreen();
             });
 
-            Button newGameBtn = new Button("New Game");
+            Button newGameBtn = new Button("Restart");
             newGameBtn.setOnAction(e -> {
                 game.restartGame();
                 gameView.updateGamePlayScreen();
@@ -220,14 +220,43 @@ public class Main extends Application {
     }
 
     class HomeScreen extends VBox {
+
+        private VBox newGameOptions;
+        private Button newGameBtn;
+        private Button exitBtn;
+
         HomeScreen() {
             getStyleClass().add("homeScreen");
 
-            Button newGameBtn = new Button("New Game");
+            newGameBtn = new Button("New Game");
             newGameBtn.setOnAction(e -> gameView.displayGamePlayScreen());
 
-            Button exitBtn = new Button("Quit");
+            exitBtn = new Button("Quit");
             exitBtn.setOnAction(e -> System.exit(0));
+
+            Button vsHumanBtn = new Button("Human vs Human");
+            vsHumanBtn.setOnAction(e -> gameView.displayGamePlayScreen());
+            vsHumanBtn.setMinWidth(WIDTH * .5);
+
+            Button vsComputerBtn = new Button("Human vs Computer");
+            vsComputerBtn.setOnAction(e -> gameView.displayGamePlayScreen());
+            vsComputerBtn.setMinWidth(WIDTH * .5);
+
+            newGameOptions = new VBox();
+            newGameOptions.getStyleClass().add("newGameOptions");
+            newGameOptions.getChildren().addAll(vsHumanBtn, vsComputerBtn);
+
+            newGameBtn.setOnMouseEntered(e -> {
+                this.getChildren().removeAll(getChildren());
+                this.getChildren().add(newGameOptions);
+                this.getChildren().add(exitBtn);
+            });
+
+            newGameOptions.setOnMouseExited(e -> {
+                this.getChildren().removeAll(getChildren());
+                this.getChildren().add(newGameBtn);
+                this.getChildren().add(exitBtn);
+            });
 
             for(Button button : new Button[]{newGameBtn, exitBtn}) {
                 button.getStyleClass().add("homeScreenButton");
