@@ -1,7 +1,5 @@
 package sample;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.*;
 import javafx.scene.canvas.*;
 import javafx.scene.control.*;
@@ -258,10 +256,11 @@ public class Main extends Application {
             vsComputerBtn.setMinWidth(WIDTH * .5);
 
             newGameOptions = new VBox();
+            newGameOptions.setMaxWidth(WIDTH * .5);
             newGameOptions.getStyleClass().add("newGameOptions");
             newGameOptions.getChildren().addAll(vsHumanBtn, vsComputerBtn);
             vsHumanBtn.setStyle("-fx-border-color: black;");
-            vsComputerBtn.setStyle("-fx-border-color: transparent black;");
+            vsComputerBtn.setStyle("-fx-border-color: transparent black black black;");
 
             newGameBtn.setOnMouseEntered(e -> {
                 this.getChildren().removeAll(getChildren());
