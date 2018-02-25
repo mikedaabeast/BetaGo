@@ -95,6 +95,8 @@ public class Game {
         board.clearBoard();
         for (Player p : players) p.resetScore();
         turn = 0;
+        lastTurnPassed = false;
+        prevMove = null;
     }
 
 }

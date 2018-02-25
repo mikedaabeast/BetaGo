@@ -201,7 +201,7 @@ public class Main extends Application {
             });
 
             label = new Label("");
-            label.getStyleClass().add("label");
+            label.getStyleClass().add("sidePanelLabel");
             label.setPrefWidth(WIDTH * 0.20);
             updateLabel();
 
@@ -215,7 +215,7 @@ public class Main extends Application {
         }
 
         private void updateLabel() {
-            label.setText(game.getCurrentPlayer().getName() + "'s turn\nP1: " + game.getPlayers()[0].numStonesCaptured() + " P2: " + game.getPlayers()[1].numStonesCaptured());
+            label.setText(game.getCurrentPlayer().getName() + "'s turn\nP1: " + game.getPlayers()[0].numStonesCaptured() + "\nP2: " + game.getPlayers()[1].numStonesCaptured());
          }
     }
 
@@ -224,9 +224,13 @@ public class Main extends Application {
         private VBox newGameOptions;
         private Button newGameBtn;
         private Button exitBtn;
+        private Label label;
 
         HomeScreen() {
             getStyleClass().add("homeScreen");
+
+            label = new Label("BetaGo");
+            label.getStyleClass().add("homeScreenLabel");
 
             newGameBtn = new Button("New Game");
             newGameBtn.setOnAction(e -> gameView.displayGamePlayScreen());
@@ -245,15 +249,19 @@ public class Main extends Application {
             newGameOptions = new VBox();
             newGameOptions.getStyleClass().add("newGameOptions");
             newGameOptions.getChildren().addAll(vsHumanBtn, vsComputerBtn);
+            vsHumanBtn.setStyle("-fx-border-color: black;");
+            vsComputerBtn.setStyle("-fx-border-color: transparent black black black;");
 
             newGameBtn.setOnMouseEntered(e -> {
                 this.getChildren().removeAll(getChildren());
+                this.getChildren().add(label);
                 this.getChildren().add(newGameOptions);
                 this.getChildren().add(exitBtn);
             });
 
             newGameOptions.setOnMouseExited(e -> {
                 this.getChildren().removeAll(getChildren());
+                this.getChildren().add(label);
                 this.getChildren().add(newGameBtn);
                 this.getChildren().add(exitBtn);
             });
@@ -263,7 +271,7 @@ public class Main extends Application {
                 button.setMinWidth(WIDTH * .5);
             }
 
-            getChildren().addAll(newGameBtn, exitBtn);
+            getChildren().addAll(label, newGameBtn, exitBtn);
         }
     }
 
