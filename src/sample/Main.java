@@ -13,7 +13,7 @@ import sample.Model.Utility.*;
 public class Main extends Application {
 
     private static final int WIDTH  = (int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2;
-    private static final int HEIGHT = (int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2;
+    private static final int HEIGHT = WIDTH;
 
     private Game game;
     private GameView gameView;
