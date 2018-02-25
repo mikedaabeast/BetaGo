@@ -1,5 +1,7 @@
 package sample;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.*;
 import javafx.scene.canvas.*;
 import javafx.scene.control.*;
@@ -12,8 +14,8 @@ import sample.Model.Utility.*;
 
 public class Main extends Application {
 
-    private static final int WIDTH  = (int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2;
-    private static final int HEIGHT = WIDTH;
+    private static int WIDTH  = (int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2;
+    private static int HEIGHT = WIDTH;
 
     private Game game;
     private GameView gameView;
@@ -235,6 +237,15 @@ public class Main extends Application {
             newGameBtn = new Button("New Game");
             newGameBtn.setOnAction(e -> gameView.displayGamePlayScreen());
 
+//            Slider slider = new Slider(1, 19, 9);
+//            slider.setShowTickLabels(true);
+//            slider.setShowTickMarks(true);
+//            slider.valueProperty().addListener((ov, old_val, new_val) -> {
+//                game.setBoardSize((int) slider.getValue());
+//                gameView.updateGamePlayScreen();
+//            });
+//            slider.setMaxWidth(WIDTH * .5);
+
             exitBtn = new Button("Quit");
             exitBtn.setOnAction(e -> System.exit(0));
 
@@ -250,7 +261,7 @@ public class Main extends Application {
             newGameOptions.getStyleClass().add("newGameOptions");
             newGameOptions.getChildren().addAll(vsHumanBtn, vsComputerBtn);
             vsHumanBtn.setStyle("-fx-border-color: black;");
-            vsComputerBtn.setStyle("-fx-border-color: transparent black black black;");
+            vsComputerBtn.setStyle("-fx-border-color: transparent black;");
 
             newGameBtn.setOnMouseEntered(e -> {
                 this.getChildren().removeAll(getChildren());
