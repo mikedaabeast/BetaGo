@@ -9,7 +9,7 @@
     -fx-text-fill: black;
 }
 
-// Home Screen
+// Home Screen ---------------------------------------------
 
 .homeScreen {
     -fx-alignment: center;
@@ -33,7 +33,7 @@
     -fx-font-size: 18pt;
 }
 
-// Game Play Screen
+// Game Play Screen ---------------------------------------------
 
 .boardView {
      -fx-background-image: url("../images/wood.jpg");

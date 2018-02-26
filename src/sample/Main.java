@@ -12,8 +12,8 @@ import sample.Model.Utility.*;
 
 public class Main extends Application {
 
-    private static int WIDTH  = (int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2;
-    private static int HEIGHT = WIDTH;
+    private static int HEIGHT = (int) (java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 1.25);
+    private static int WIDTH = HEIGHT;
 
     private Game game;
     private GameView gameView;
@@ -27,8 +27,8 @@ public class Main extends Application {
         game = new Game();
 
         gameView = new GameView();
-        gameView.setPrefSize(WIDTH, HEIGHT);
         gameView.getStylesheets().add("sample/stylesheet.css");
+        gameView.setPrefSize(WIDTH, HEIGHT);
         gameView.displayGamePlayScreen();
 
         primaryStage.setTitle("Go");
@@ -221,9 +221,10 @@ public class Main extends Application {
 
     class HomeScreen extends VBox {
 
-        private VBox newGameOptions;
         private Button newGameBtn;
+        private Button settingsBtn;
         private Button exitBtn;
+        private VBox newGameOptions;
         private Label label;
 
         HomeScreen() {
@@ -235,14 +236,8 @@ public class Main extends Application {
             newGameBtn = new Button("New Game");
             newGameBtn.setOnAction(e -> gameView.displayGamePlayScreen());
 
-//            Slider slider = new Slider(1, 19, 9);
-//            slider.setShowTickLabels(true);
-//            slider.setShowTickMarks(true);
-//            slider.valueProperty().addListener((ov, old_val, new_val) -> {
-//                game.setBoardSize((int) slider.getValue());
-//                gameView.updateGamePlayScreen();
-//            });
-//            slider.setMaxWidth(WIDTH * .5);
+            settingsBtn = new Button("Settings");
+            settingsBtn.setOnAction(e -> {});
 
             exitBtn = new Button("Quit");
             exitBtn.setOnAction(e -> System.exit(0));
@@ -255,17 +250,24 @@ public class Main extends Application {
             vsComputerBtn.setOnAction(e -> gameView.displayGamePlayScreen());
             vsComputerBtn.setMinWidth(WIDTH * .5);
 
+            vsHumanBtn.setStyle("-fx-border-color: black;");            // TODO: use .css file
+            vsComputerBtn.setStyle("-fx-border-color: transparent black black black;");
+
+            for(Button button : new Button[]{newGameBtn, settingsBtn, exitBtn}) {
+                button.getStyleClass().add("homeScreenButton");
+                button.setMinWidth(WIDTH * .5);
+            }
+
             newGameOptions = new VBox();
             newGameOptions.setMaxWidth(WIDTH * .5);
             newGameOptions.getStyleClass().add("newGameOptions");
             newGameOptions.getChildren().addAll(vsHumanBtn, vsComputerBtn);
-            vsHumanBtn.setStyle("-fx-border-color: black;");
-            vsComputerBtn.setStyle("-fx-border-color: transparent black black black;");
 
             newGameBtn.setOnMouseEntered(e -> {
                 this.getChildren().removeAll(getChildren());
                 this.getChildren().add(label);
                 this.getChildren().add(newGameOptions);
+//              this.getChildren().add(settingsBtn);
                 this.getChildren().add(exitBtn);
             });
 
@@ -273,13 +275,9 @@ public class Main extends Application {
                 this.getChildren().removeAll(getChildren());
                 this.getChildren().add(label);
                 this.getChildren().add(newGameBtn);
+//              this.getChildren().add(settingsBtn);
                 this.getChildren().add(exitBtn);
             });
-
-            for(Button button : new Button[]{newGameBtn, exitBtn}) {
-                button.getStyleClass().add("homeScreenButton");
-                button.setMinWidth(WIDTH * .5);
-            }
 
             getChildren().addAll(label, newGameBtn, exitBtn);
         }

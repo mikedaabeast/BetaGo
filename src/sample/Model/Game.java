@@ -6,7 +6,7 @@ public class Game {
     private Player[] players;
     private Board board;
     private int turn;
-    private MoveData prevMove;  // ko rule
+    private MoveData prevMove;          // ko rule
     private boolean lastTurnPassed;
 
     public Game() {
