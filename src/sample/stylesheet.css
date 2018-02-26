@@ -13,6 +13,7 @@
 
 .homeScreen {
     -fx-alignment: center;
+    -fx-font-size: 32pt;
     -fx-spacing: 10;
     -fx-background-image: url("../images/background1.jpg");
     -fx-background-repeat: stretch;
@@ -54,4 +55,19 @@
 .sidePanelLabel {
     -fx-font-size: 11pt;
     -fx-font-family: "Verdana";
+}
+
+// ----
+
+.humanVsHumanScreen {
+    -fx-alignment: center;
+    -fx-font-size: 30pt;
+    -fx-spacing: 20;
+    -fx-background-image: url("../images/background.jpg");
+    -fx-background-repeat: stretch;
+}
+
+.boardSizeButtons {
+    -fx-font-size: 32pt;
+    -fx-spacing: 10;
 }
