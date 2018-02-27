@@ -62,7 +62,7 @@
 .humanVsHumanScreen {
     -fx-alignment: center;
     -fx-font-size: 30pt;
-    -fx-spacing: 20;
+    -fx-spacing: 30;
     -fx-background-image: url("../images/background.jpg");
     -fx-background-repeat: stretch;
 }
@@ -70,4 +70,10 @@
 .boardSizeButtons {
     -fx-font-size: 32pt;
     -fx-spacing: 10;
+}
+
+.playBackButtons {
+    -fx-spacing: 50;
+    -fx-alignment: center;
+    -fx-font-size: 26pt;
 }
