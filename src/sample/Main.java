@@ -1,6 +1,5 @@
 package sample;
 import javafx.application.Application;
-import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.canvas.*;
 import javafx.scene.control.*;
@@ -32,8 +31,8 @@ public class Main extends Application {
         gameView.setPrefSize(WIDTH, HEIGHT);
         gameView.displayGamePlayScreen();
 
-        primaryStage.setTitle("Go");
-        primaryStage.setScene(new Scene(gameView, WIDTH * (1 / 0.80), HEIGHT ));
+        primaryStage.setTitle("BetaGo");
+        primaryStage.setScene( new Scene(gameView, WIDTH / 0.80, HEIGHT) );
         primaryStage.show();
     }
 
@@ -170,9 +169,9 @@ public class Main extends Application {
             }
         }
 
-        final Image image = new Image(Main.class.getResourceAsStream("../images/wood1.jpg"));
+        final Image woodImg = new Image(Main.class.getResourceAsStream("../images/wood1.jpg"));
         private void drawBackground() {
-            gc.drawImage(image, 0, 0, WIDTH, HEIGHT);
+            gc.drawImage(woodImg, 0, 0, WIDTH, HEIGHT);
             drawGridLines(game.getBoardSize());
         }
     }
@@ -212,7 +211,7 @@ public class Main extends Application {
                 button.getStyleClass().add("sidePanelButton");
             }
 
-            getChildren().addAll(label, passTurnBtn, newGameBtn, homeScreenBtn, exitBtn);
+            getChildren().addAll(label, passTurnBtn, exitBtn, newGameBtn, homeScreenBtn);
         }
 
         private void updateLabel() {
@@ -222,13 +221,14 @@ public class Main extends Application {
 
     class HomeScreen extends VBox {
 
+        private Label label;
         private Button newGameBtn;
         private Button settingsBtn;
         private Button exitBtn;
         private VBox newGameOptions;
-        private Label label;
 
         HumanVsHumanScreen humanVsHumanScreen;
+        HumanVsComputerScreen humanVsComputerScreen;
 
         HomeScreen() {
             getStyleClass().add("homeScreen");
@@ -246,13 +246,14 @@ public class Main extends Application {
             exitBtn.setOnAction(e -> System.exit(0));
 
             humanVsHumanScreen = new HumanVsHumanScreen();
+            humanVsComputerScreen = new HumanVsComputerScreen();
 
             Button vsHumanBtn = new Button("Human vs Human");
             vsHumanBtn.setOnAction(e -> gameView.displayScreen(humanVsHumanScreen));
             vsHumanBtn.setMinWidth(WIDTH * .5);
 
             Button vsComputerBtn = new Button("Human vs Computer");
-            vsComputerBtn.setOnAction(e -> gameView.displayGamePlayScreen());
+            vsComputerBtn.setOnAction(e -> gameView.displayScreen(humanVsComputerScreen));
             vsComputerBtn.setMinWidth(WIDTH * .5);
 
             vsHumanBtn.setStyle("-fx-border-color: black;");            // TODO: use .css file
@@ -290,33 +291,28 @@ public class Main extends Application {
 
     class HumanVsHumanScreen extends VBox {
 
-        private Button playBtn;
-        private Button backBtn;
-        private Label label;
-
         HumanVsHumanScreen() {
             getStyleClass().add("humanVsHumanScreen");
 
-            playBtn = new Button("Play");
+            // -----------------------
+            Button playBtn = new Button("Play");
             playBtn.setOnAction(e -> gameView.displayGamePlayScreen());
 
-            backBtn = new Button("Back");
+            Button backBtn = new Button("Back");
             backBtn.setOnAction(e -> gameView.displayHomeScreen());
 
             for(Button button : new Button[]{playBtn, backBtn}) {
-                button.setStyle("-fx-font-size: 28pt;");
+                button.setStyle("-fx-font-size: 26pt;");
                 button.setMinWidth(WIDTH * .5);
             }
 
-            HBox hBox = new HBox();
-            hBox.getChildren().addAll(playBtn, backBtn);
-            hBox.setStyle("-fx-alignment: center;");
+            HBox playAndBackBtns = new HBox();
+            playAndBackBtns.getChildren().addAll(backBtn, playBtn);
+            playAndBackBtns.getStyleClass().add("playBackButtons");
 
             // ------------------------------------
-
-            HBox btnHbox = new HBox();
-            btnHbox.setStyle("-fx-alignment: center;");
-            btnHbox.setSpacing(20.0);
+            HBox boardSizeBtns = new HBox();
+            boardSizeBtns.getStyleClass().add("playBackButtons");
 
             for (Integer i :  new int[]{9, 13, 19}) {
                 Button button = new Button(i + "");
@@ -330,13 +326,12 @@ public class Main extends Application {
                     gameView.updateGamePlayScreen();
                 });
 
-                btnHbox.getChildren().add(button);
+                boardSizeBtns.getChildren().add(button);
             }
 
             // ------------------------------
-
-            GridPane grid = new GridPane();
-            grid.add( new Label("Players"), 0, 0, 2, 1);
+            GridPane nameSelectGrid = new GridPane();
+            nameSelectGrid.add( new Label("Players"), 0, 0, 2, 1);
 
             int imageWidth = WIDTH / 5;
             ImageView whiteImageView = new ImageView( new Image(Main.class.getResourceAsStream("../images/white.png"), imageWidth, imageWidth, true, true) );
@@ -345,19 +340,79 @@ public class Main extends Application {
             TextField playerOneName = new TextField("Player 1");
             TextField playerTwoName = new TextField("Player 2");
 
-            grid.add(blackImageView, 0, 1);
-            grid.add(playerOneName,  1, 1);
-            grid.add(whiteImageView, 0, 2);
-            grid.add(playerTwoName,  1, 2);
+            nameSelectGrid.add(blackImageView, 0, 1);
+            nameSelectGrid.add(playerOneName,  1, 1);
+            nameSelectGrid.add(whiteImageView, 0, 2);
+            nameSelectGrid.add(playerTwoName,  1, 2);
 
-            grid.setPrefWidth(WIDTH / 5);
-            grid.setMinWidth(WIDTH  / 5);
-            grid.setStyle("-fx-alignment: center;");
-
+            nameSelectGrid.setPrefWidth(WIDTH / 5);
+            nameSelectGrid.setMinWidth(WIDTH  / 5);
+            nameSelectGrid.setStyle("-fx-alignment: center;");
             // ------------------------------
 
-            label = new Label("Board size");
-            getChildren().addAll(label, btnHbox, grid, hBox);
+            Label boardSizeLabel = new Label("Board size");
+            getChildren().addAll(boardSizeLabel, boardSizeBtns, nameSelectGrid, playAndBackBtns);
+        }
+    }
+
+    class HumanVsComputerScreen extends VBox {
+
+        HumanVsComputerScreen() {
+            getStyleClass().add("humanVsHumanScreen");
+
+            //--------------------------------------
+            Button playBtn = new Button("Play");
+            playBtn.setOnAction(e -> gameView.displayGamePlayScreen());
+
+            Button backBtn = new Button("Back");
+            backBtn.setOnAction(e -> gameView.displayHomeScreen());
+
+            for(Button button : new Button[]{playBtn, backBtn})
+                button.setMinWidth(WIDTH * .5);
+
+            HBox playAndBackBtns = new HBox();
+            playAndBackBtns.getChildren().addAll(backBtn, playBtn);
+            playAndBackBtns.getStyleClass().add("playBackButtons");
+
+            // ------------------------------------
+            HBox boardSizeBtns = new HBox();
+            boardSizeBtns.setStyle("-fx-alignment: center;");
+            boardSizeBtns.setSpacing(20.0);
+
+            for (Integer i :  new int[]{9, 13, 19}) {
+                Button button = new Button(i + "");
+                button.getStyleClass().add("boardSizeButtons");
+                button.setPrefWidth(WIDTH / 5);
+                button.setMinWidth(WIDTH / 5);
+
+                final int boardSize = i;
+                button.setOnAction(e -> {
+                    game.setBoardSize( boardSize );
+                    gameView.updateGamePlayScreen();
+                });
+
+                boardSizeBtns.getChildren().add(button);
+            }
+            
+            //--------------------------------------
+            Button easyBtn = new Button("Easy");
+            easyBtn.getStyleClass().add("boardSizeButtons");
+            easyBtn.setMinWidth(WIDTH / 5);
+
+            Button hardBtn = new Button("Hard");
+            hardBtn.getStyleClass().add("boardSizeButtons");
+            hardBtn.setMinWidth(WIDTH / 5);
+            
+            HBox difficultyBtns = new HBox();
+            difficultyBtns.setStyle("-fx-alignment: center;");
+            difficultyBtns.setSpacing(20.0);
+            difficultyBtns.getChildren().addAll(easyBtn, hardBtn);
+            //--------------------------------------
+            
+            
+            Label difficultyLabel = new Label("Difficulty");
+            Label boardSizeLabel = new Label("Board size");
+            getChildren().addAll(boardSizeLabel, boardSizeBtns, difficultyLabel, difficultyBtns, playAndBackBtns);
         }
     }
 
