@@ -216,7 +216,7 @@ public class Main extends Application {
         }
 
         private void updateLabel() {
-            label.setText(game.getCurrentPlayer().getName() + "'s turn\nP1: " + game.getPlayers()[0].numStonesCaptured() + "\nP2: " + game.getPlayers()[1].numStonesCaptured());
+            label.setText(game.getCurrentPlayer().getName() + "'s turn\nP1: " + game.getPlayers()[0].getScore() + "\nP2: " + game.getPlayers()[1].getScore());
          }
     }
 

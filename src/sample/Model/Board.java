@@ -1,9 +1,6 @@
 package sample.Model;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Queue;
-import java.util.List;
-import java.util.LinkedList;
+import java.util.*;
+
 import javafx.scene.paint.Color;
 import sample.Model.Utility.Pair;
 
@@ -13,6 +10,7 @@ public class Board {
 
     public Board(int size) {
         board = new Stone[size][size];
+        //place empty stones on every position on the board
     }
 
     public boolean isValidMove(int row, int col, Color color) {
@@ -117,6 +115,18 @@ public class Board {
             }
         }
     }
+    public Stone placeStone(int row, int col, Color color) {  // preconditions: move is valid
+        Stone newStone = createStone(row, col, color);
+        board[row][col] = newStone;
+
+        for (Stone adjacentStone : getAdjacentStonesNESW(row, col)) {
+            if (adjacentStone != null) {
+                newStone.getAdjacentStones().add(adjacentStone);
+                adjacentStone.getAdjacentStones().add(newStone);
+            }
+        }
+        return newStone;
+    }
 
     public void removeStoneFromBoard(int row, int col) {
         for (Stone adjacentStone : getAdjacentStonesNESW(row, col)) {
@@ -191,4 +201,88 @@ public class Board {
     public Stone[][] getBoard() {   // used for testing purposes
         return board;
     }
+
+    public Pair<Integer,Integer> scoreBoard(){
+        Set<Stone> visited = new HashSet<>();
+        Queue<Stone> emptyPoints; // unvisited empty points
+        Queue<Stone> unexploredNeighbors;
+        ArrayList<Stone> connectedGroup;//connected group of empty points
+        ArrayList <Pair <List,String> > listOfGroups = new ArrayList <> ();
+        String territory;
+
+        emptyPoints = createEmptyStones(); //initialize empty points
+       //begin territory exploration algorithm
+       while(emptyPoints.size()>0){
+           Stone s = emptyPoints.remove();
+           if(!visited.contains(s)){
+               unexploredNeighbors = new LinkedList<>();
+               unexploredNeighbors.add(s);
+               connectedGroup = new ArrayList<>();
+               territory = "U";
+               while(unexploredNeighbors.size()>0){
+                   Stone n = unexploredNeighbors.remove();
+                   if(!visited.contains(n)){
+                       visited.add(n);
+                   }
+                   if(emptyPoints.contains(n)){
+                      emptyPoints.remove(n);
+                   }
+                   connectedGroup.add(n);
+                   List<Stone> adjList = n.getAdjacentStones();
+                   for (Stone adjacentStone : adjList){
+                       if(adjacentStone.getColor() == Color.DARKGREY) {
+                           if((!visited.contains(adjacentStone)) && (!unexploredNeighbors.contains(adjacentStone))){
+                               unexploredNeighbors.add(adjacentStone);
+                           }
+                       }else if (adjacentStone.getColor() == Color.BLACK) {
+                           if (territory == "W" || territory == "BW") {
+                               territory = "BW";
+                           }else{
+                               territory = "B";
+                           }
+                       } else if (adjacentStone.getColor() == Color.WHITE) {
+                           if (territory == "B" || territory == "BW") {
+                               territory = "BW";
+                           }else{
+                               territory = "W";
+                           }
+                       }
+                   }
+               }
+               listOfGroups.add(new Pair(connectedGroup, territory));
+           }
+       }
+        removeEmptyStones();
+        return calculateScore(listOfGroups);
+    }
+    public void removeEmptyStones(){
+        for (int row = 0; row < board.length; row++)
+            for (int col = 0; col < board.length; col++)
+                if(board[row][col].getColor() == Color.DARKGREY){
+                    removeStoneFromBoard(row,col);
+                }
+    }
+    public Queue<Stone> createEmptyStones(){
+        Queue<Stone> emptyPoints = new LinkedList<>(); // unvisited empty points
+        //create placeholder stones for empty points
+        for (int row = 0; row < board.length; row++)
+            for (int col = 0; col < board.length; col++)
+                if(board[row][col] == null){
+                    emptyPoints.add( placeStone(row,col,Color.DARKGREY)); // add to queue with all unvisted empty points
+                }
+        return emptyPoints;
+    }
+    public Pair<Integer,Integer> calculateScore (ArrayList <Pair <List,String> > listOfGroups){
+        int black = 0;
+        int white = 0;
+        for(Pair <List,String> group:listOfGroups){
+            if(group.getValue() == "B"){
+                black += group.getKey().size();
+            }else if(group.getValue() == "W"){
+                white += group.getKey().size();
+            }
+        }
+        return new Pair(black, white);
+    }
+
 }

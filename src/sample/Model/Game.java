@@ -25,7 +25,7 @@ public class Game {
         Player currentPlayer = getCurrentPlayer();
 
         return board.isValidMove(row, col, currentPlayer.getColor()) && !isRepeatBoardPosition(row, col, currentPlayer.getColor());
-    }
+}
 
     private boolean isRepeatBoardPosition(int row, int col, Color color) {
         boolean isRepeatPosition = false;
@@ -53,7 +53,7 @@ public class Game {
 
         board.placeStoneOnBoard(row, col, currentPlayer.getColor());                // make move
         int numStonesCaptured = board.captureStones(currentPlayer.getColor());      // capture enemy stones
-        currentPlayer.incrementStonesCaptured(numStonesCaptured);                   // increment score by # stones captured
+        currentPlayer.incrementScore(numStonesCaptured);                   // increment score by # stones captured
 
         prevMove = new MoveData(row, col, numStonesCaptured);
         lastTurnPassed = false;
@@ -61,7 +61,11 @@ public class Game {
     }
 
     public void passTurn() {
-        if(lastTurnPassed) System.exit(0);
+        if(lastTurnPassed) {
+            gameOver();
+            //System.exit(0);
+        }
+
         nextTurn();
         lastTurnPassed = true;
     }
@@ -72,7 +76,7 @@ public class Game {
 
     @Override
     public String toString() {
-        return board.toString() + "SCORES P1: " + players[0].numStonesCaptured() + " P2: " + players[1].numStonesCaptured() + '\n';
+        return board.toString() + "SCORES P1: " + players[0].getScore() + " P2: " + players[1].getScore() + '\n';
     }
 
     public Player getCurrentPlayer() {
@@ -91,6 +95,16 @@ public class Game {
         return board.size();
     }
 
+    public void gameOver(){
+        Pair<Integer,Integer> score = board.scoreBoard();
+        for (Player p : players){
+            if(p.getColor() == Color.BLACK){
+                p.incrementScore(score.getKey());
+            }else{
+                p.incrementScore(score.getValue());
+            }
+        }
+    }
     public void restartGame() {
         board.clearBoard();
         for (Player p : players) p.resetScore();

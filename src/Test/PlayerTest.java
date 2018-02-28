@@ -18,12 +18,12 @@ class PlayerTest {
         assertEquals(player2.getName(), "P2");
         assertEquals(player2.getColor(), Color.WHITE);
 
-        player1.incrementStonesCaptured(10);
-        player1.incrementStonesCaptured(-5);
-        player2.incrementStonesCaptured(20);
-        player2.incrementStonesCaptured(-5);
-        assertEquals(player1.numStonesCaptured(), 5);
-        assertEquals(player2.numStonesCaptured(), 15);
+        player1.incrementScore(10);
+        player1.incrementScore(-5);
+        player2.incrementScore(20);
+        player2.incrementScore(-5);
+        assertEquals(player1.getScore(), 5);
+        assertEquals(player2.getScore(), 15);
     }
 
 }
